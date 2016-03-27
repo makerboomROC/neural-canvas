@@ -13,7 +13,7 @@ export class HerbivoreCanvasComponent implements AfterViewInit {
     canvasElement:HTMLCanvasElement;
 
     constructor() {
-        this.herbivores.push(new Herbivore({x: 10, y: 10}, 0));
+        this.herbivores.push(new Herbivore({x: 10, y: 10}, 180));
     }
 
     ngAfterViewInit() {
@@ -26,7 +26,7 @@ export class HerbivoreCanvasComponent implements AfterViewInit {
 
         this.clearCanvas(context);
         this.herbivores.forEach(herbivore => {
-            herbivore.turn(0.1);
+            herbivore.tick();
             this.drawHerbivore(context, herbivore);
         });
 
