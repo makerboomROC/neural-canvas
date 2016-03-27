@@ -1,14 +1,36 @@
 import {Layer} from "./layer";
 
 export class Network {
-    input:Layer = null;
-    hidden:Layer[] = [];
-    output:Layer = null;
+
+    static perceptron(...layerSizes:number[]):Network {
+        let inputSize = layerSizes.shift(),
+            outputSize = layerSizes.pop(),
+            input = new Layer(inputSize),
+            output = new Layer(outputSize),
+            hidden = [],
+            previous = input;
+
+        layerSizes.forEach(layerSize => {
+            let layer = new Layer(layerSize);
+            hidden.push(layer);
+            previous.project(layer);
+            previous = layer;
+        });
+        previous.project(output);
+
+        let network = new Network(input, output, hidden);
+        return network;
+    }
+
+    input:Layer;
+    hidden:Layer[];
+    output:Layer;
     optimized:boolean = false;
 
-    constructor(inputSize:number = 0, outputSize:number = 0) {
-        this.input = new Layer(inputSize);
-        this.output = new Layer(outputSize);
+    constructor(input?:Layer, output?:Layer, hidden:Layer[] = []) {
+        this.input = input || new Layer();
+        this.output = output|| new Layer();
+        this.hidden = hidden;
     }
 
     activate(input) {

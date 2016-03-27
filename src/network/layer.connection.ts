@@ -15,25 +15,25 @@ export class LayerConnection {
     list = [];
     size:number = 0;
 
-    constructor(input:Layer, output:Layer, type:LayerConnectionType, weights) {
+    constructor(input:Layer, output:Layer, type?:LayerConnectionType, weights?:number) {
         this.input = input;
         this.output = output;
         this.selfConnection = output === input;
-        this.type = type;
         this.connections = {};
         this.list = [];
         this.size = 0;
 
-        if (typeof this.type === 'undefined') {
+        if (typeof type === 'undefined') {
             if (input === output) {
-                this.type = LayerConnectionType.ONE_TO_ONE;
+                type = LayerConnectionType.ONE_TO_ONE;
             } else {
-                this.type = LayerConnectionType.ALL_TO_ALL;
+                type = LayerConnectionType.ALL_TO_ALL;
             }
         }
+        this.type = type;
 
-        if (this.type == LayerConnectionType.ALL_TO_ALL ||
-            this.type == LayerConnectionType.ALL_TO_ELSE) {
+        if (this.type === LayerConnectionType.ALL_TO_ALL ||
+            this.type === LayerConnectionType.ALL_TO_ELSE) {
             this.input.list.forEach(inputNode => {
                 this.output.list.forEach(outputNode => {
                     if (this.type === LayerConnectionType.ALL_TO_ELSE && inputNode === outputNode) {

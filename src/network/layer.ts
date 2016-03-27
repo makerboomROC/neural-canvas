@@ -48,10 +48,11 @@ export class Layer {
     }
 
     // projects a connection from this layer to another one
-    project(layer, type, weights) {
+    project(layer:Layer|Network, type?:LayerConnectionType, weights?:number) {
 
-        if (layer instanceof Network)
-            layer = layer.layers.input;
+        if (layer instanceof Network) {
+            layer = (<Network>layer).input;
+        }
 
         if (layer instanceof Layer) {
             if (!this.connected(layer))

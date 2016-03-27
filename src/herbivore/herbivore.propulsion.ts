@@ -1,9 +1,9 @@
 import {Herbivore} from "./herbivore";
 import {Node} from "../network/node";
 
-export class Engine extends Node {
+export class HerbivorePropulsion extends Node {
     target:Herbivore;
-    maxSpeed:number = 0.1;
+    maxSpeed:number = 1;
 
     constructor(target:Herbivore) {
         super();
@@ -19,12 +19,13 @@ export class Engine extends Node {
     moveTarget() {
         if(this.activation !== 0){
             let speed = this.activation * this.maxSpeed,
-                angle = (Math.PI / 180) * this.target.orientation,
+                orientation = this.target.orientation - 90,
+                angle = (Math.PI / 180) * orientation,
                 location = this.target.location,
-                dx = speed * Math.sin(angle),
-                dy = speed * Math.cos(angle);
+                dx = speed * Math.cos(angle),
+                dy = speed * Math.sin(angle);
             location.x += dx;
-            location.y -= dy;
+            location.y += dy;
         }
     }
 }
