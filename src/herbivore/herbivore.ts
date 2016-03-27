@@ -1,5 +1,6 @@
 import {HerbivorePropulsion} from "./herbivore.propulsion";
 import {HerbivoreNetwork} from "./herbivore.network";
+import {HerbivoreRotation} from "./herbivore.rotation";
 
 interface Location {
     x:number;
@@ -10,6 +11,7 @@ export class Herbivore {
     location:Location;
     orientation:number;
 
+    rotation:HerbivoreRotation;
     propulsion:HerbivorePropulsion;
     network:HerbivoreNetwork;
 
@@ -18,7 +20,8 @@ export class Herbivore {
         this.orientation = orientation;
 
         this.propulsion = new HerbivorePropulsion(this);
-        this.network = new HerbivoreNetwork(this.propulsion);
+        this.rotation = new HerbivoreRotation(this);
+        this.network = new HerbivoreNetwork(this.propulsion, this.rotation);
     }
 
     tick() {

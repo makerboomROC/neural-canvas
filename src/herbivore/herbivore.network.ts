@@ -5,10 +5,11 @@ import {Node} from "../network/node";
 export class HerbivoreNetwork extends Network {
     perception:Layer;
 
-    constructor(propulsion:Node, perception?:Layer) {
+    constructor(propulsion:Node, rotation:Node, perception?:Layer) {
         super();
         this.input.add(new Node());
         this.output.add(propulsion);
+        this.output.add(rotation);
 
         this.perception = perception || new Layer(1);
         this.hidden.push(this.perception);
