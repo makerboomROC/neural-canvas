@@ -21,7 +21,10 @@ export class Herbivore {
 
         this.propulsion = new HerbivorePropulsion(this);
         this.rotation = new HerbivoreRotation(this);
-        this.network = new HerbivoreNetwork(this.propulsion, this.rotation);
+        let network = this.network = new HerbivoreNetwork(this.propulsion, this.rotation);
+        network.mutate(1);
+        network.mutate(1);
+        network.mutate(1);
     }
 
     tick() {

@@ -12,5 +12,15 @@ export class Connection {
         this.output = output;
         this.weight = typeof weight == 'undefined' ? Math.random() * .2 - .1 : weight;
     }
+
+    mutate(rate = 0.1, gradient?:number) {
+        if(typeof gradient === 'undefined') {
+            gradient = 0.01;
+            if(Math.random() < 0.5) {
+                gradient *= -1;
+            }
+        }
+        this.weight += rate * gradient;
+    }
     
 }

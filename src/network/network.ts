@@ -84,4 +84,12 @@ export class Network {
         });
         return result;
     }
+
+    mutate(chance:number = 0.1) {
+        this.input.mutate(chance, false);
+        this.output.mutate(chance, false);
+        this.hidden.forEach(layer => {
+            layer.mutate(chance);
+        });
+    }
 }

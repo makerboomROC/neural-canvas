@@ -94,7 +94,7 @@ export class Node {
         return typeof connection !== 'undefined';
     }
 
-    project(node, weight):Connection {
+    project(node:Node, weight?:number):Connection {
         // self-connection
         if (node === this) {
             this.selfConnection.weight = 1;
@@ -132,5 +132,13 @@ export class Node {
 
     clear() {
 
+    }
+    
+    mutate(chance:number = 0.1) {
+        this.outputs.forEach(connection => {
+            if(Math.random() < chance) {
+                connection.mutate();
+            }
+        })
     }
 }

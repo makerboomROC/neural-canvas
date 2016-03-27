@@ -18,8 +18,8 @@ export class HerbivoreRotation extends Node {
 
     rotateTarget() {
         if(this.activation !== 0){
-            let activation = this.activation * 2;
-            if(activation > 1) activation -= 1;
+            let activation = this.activation;
+            if(Math.random() > 0.5) activation *= -1;
 
             let speed = activation * this.maxSpeed;
             this.target.orientation += speed;

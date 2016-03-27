@@ -1,6 +1,7 @@
 import {Network} from "./network";
 import {LayerConnection, LayerConnectionType} from "./layer.connection";
 import {Node} from './node';
+import {Connection} from "./connection";
 
 export class Layer {
 
@@ -92,6 +93,12 @@ export class Layer {
         return null;
     }
 
+    projections():Connection[] {
+        return this.list.reduce((result, node) => {
+            return result.concat(node.outputs);
+        }, [])
+    }
+
     // clears all the neuorns in the layer
     clear() {
         this.list.forEach(node => {
@@ -107,7 +114,34 @@ export class Layer {
     }
 
     // adds a neuron to the layer
-    add(node:Node) {
+    add(node:Node = new Node()):Node {
         this.size = this.list.push(node);
+        return node;
+    }
+
+    mutate(chance:number = 0.1, creation:boolean = true) {
+        this.list.forEach(node => {
+            node.mutate(chance);
+        });
+        // Add random connection
+        if(creation && Math.random() < chance) {
+            let inputIndex = Math.floor(Math.random() * this.list.length),
+                outputIndex = Math.floor(Math.random() * this.list.length),
+                inputNode = this.list[inputIndex],
+                outputNode = this.list[outputIndex];
+
+            inputNode.project(outputNode);
+        }
+        // Add random node
+        if(creation && Math.random() < chance) {
+            let projections = this.projections(),
+                index = Math.floor(Math.random() * projections.length),
+                projection = projections[index],
+                outputNode = projection.output,
+                newNode = this.add();
+
+            newNode.project(outputNode);
+            projection.output = newNode;
+        }
     }
 }
