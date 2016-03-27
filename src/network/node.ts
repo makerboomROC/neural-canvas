@@ -24,7 +24,7 @@ export class Node {
     }
 
     // activate the neuron
-    activate(input?:number):number {
+    activate(input?:any):number {
         // activation from enviroment (for input neurons)
         if (typeof input != 'undefined') {
             this.activation = input;

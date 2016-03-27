@@ -27,11 +27,11 @@ export class HerbivoreCanvasComponent implements AfterViewInit {
     }
 
     tick() {
-        let context = this.getContext();
+        this.world.tick();
 
+        let context = this.getContext();
         this.clearCanvas(context);
         this.world.entities.forEach(entity => {
-            entity.tick();
             this.drawEntity(entity, context);
         });
 

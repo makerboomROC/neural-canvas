@@ -33,7 +33,7 @@ export class Network {
         this.hidden = hidden;
     }
 
-    activate(input) {
+    activate(input?:any) {
         if (this.optimized === false) {
             this.input.activate(input);
             this.hidden.forEach(layer => {
