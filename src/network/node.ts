@@ -121,6 +121,14 @@ export class Node {
         return connection;
     }
 
+    deproject(node:Node) {
+        let connection = this.outputTo(node),
+            index = this.outputs.indexOf(connection);
+        if(index > -1) {
+            this.outputs.splice(index, 1);
+        }
+    }
+
     // returns true or false whether the neuron is self-connected or not
     selfconnected():boolean {
         return this.selfConnection.weight !== 0;
@@ -136,9 +144,22 @@ export class Node {
     
     mutate(chance:number = 0.1) {
         this.outputs.forEach(connection => {
-            if(Math.random() < chance) {
+            if(Math.random() > 1 - chance) {
                 connection.mutate();
             }
         })
+    }
+
+    clone():Node {
+        let node = new Node();
+        node.activation = this.activation;
+        node.derivative = this.derivative;
+        node.bias = this.bias;
+        node.state = this.state;
+        node.old = this.old;
+        node.squash = this.squash;
+        node.selfConnection.weight = this.selfConnection.weight;
+
+        return node;
     }
 }

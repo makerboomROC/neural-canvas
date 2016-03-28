@@ -22,5 +22,10 @@ export class Connection {
         }
         this.weight += rate * gradient;
     }
+
+    clone():Connection {
+        let connection = new Connection(this.input, this.output, this.weight);
+        return connection;
+    }
     
 }

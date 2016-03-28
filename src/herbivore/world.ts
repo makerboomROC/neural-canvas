@@ -30,12 +30,12 @@ export class World {
         })
     }
 
-    closest<T>(location:Location, type:T = Entity):T {
+    closest(location:Location, type = Entity):Entity {
         let closestDistance = Infinity,
             closestEntity = null;
 
         this.entities.forEach(entity => {
-            if(!entity instanceof type) return;
+            if(!(entity instanceof type)) return;
 
             let distance = entity.distance(location);
 

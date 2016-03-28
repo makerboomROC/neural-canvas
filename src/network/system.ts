@@ -17,4 +17,10 @@ export class System {
     tick(input:any) {
         this.network.activate(input);
     }
+
+    clone():System {
+        let network = this.network.clone(),
+            system = new System(network);
+        return system;
+    }
 }

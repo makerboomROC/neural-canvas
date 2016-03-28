@@ -1,2 +1,51 @@
 <h2>Herbivore Canvas</h2>
 <canvas #canvas width="400" height="400" style="background-color: #eeeeee;"></canvas>
+<section class="meta" style="display: flex;">
+    <article class="totals">
+        <h4>Totals</h4>
+        <dl>
+            <dt>Ticks</dt>
+            <dd>{{world.ticks}}</dd>
+            <dt>Entities</dt>
+            <dd>{{entities.length}}</dd>
+            <dt>Herbivores</dt>
+            <dd>{{herbivores.length}}</dd>
+            <dt>Plants</dt>
+            <dd>{{plants.length}}</dd>
+        </dl>
+    </article>
+    <article class="last-herbivore">
+        <h4>Last herbivore</h4>
+        <dl *ngIf="lastHerbivore">
+            <dt>ID</dt>
+            <dd>{{lastHerbivore.id}}</dd>
+            <dt>ParentID</dt>
+            <dd>{{lastHerbivore.parentId}}</dd>
+            <dt>Age</dt>
+            <dd>{{lastHerbivore.age}}</dd>
+            <dt>Energy</dt>
+            <dd>{{lastHerbivore.energy | number:'1.2-2'}}</dd>
+            <dt>Nodes</dt>
+            <dd>{{lastHerbivore.system.network.nodes(true).length}}</dd>
+            <dt>Projections</dt>
+            <dd>{{lastHerbivore.system.network.projections(true).length}}</dd>
+        </dl>
+    </article>
+    <article class="best-herbivore">
+        <h4>Best herbivore</h4>
+        <dl *ngIf="bestHerbivore">
+            <dt>ID</dt>
+            <dd>{{bestHerbivore.id}}</dd>
+            <dt>ParentID</dt>
+            <dd>{{lastHerbivore.parentId}}</dd>
+            <dt>Age</dt>
+            <dd>{{bestHerbivore.age}}</dd>
+            <dt>Energy</dt>
+            <dd>{{bestHerbivore.energy | number:'1.2-2'}}</dd>
+            <dt>Nodes</dt>
+            <dd>{{bestHerbivore.system.network.nodes(true).length}}</dd>
+            <dt>Projections</dt>
+            <dd>{{bestHerbivore.system.network.projections(true).length}}</dd>
+        </dl>
+    </article>
+</section>

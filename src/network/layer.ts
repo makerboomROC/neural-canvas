@@ -11,6 +11,12 @@ export class Layer {
     list:Node[] = [];
     connectedTo = [];
 
+    build(list:Node[], label?:string) {
+        let layer = new Layer(list.length, label);
+        list.forEach(node => layer.add(node));
+        return layer;
+    }
+
     constructor(size?:number, label?:string) {
         this.size = size = size | 0;
         this.label = label || null;
@@ -119,21 +125,18 @@ export class Layer {
         return node;
     }
 
-    mutate(chance:number = 0.1, creation:boolean = true) {
+    mutate(chance:number = 0.1, projections:boolean = true, nodes:boolean = true) {
         this.list.forEach(node => {
             node.mutate(chance);
         });
-        // Add random connection
-        if (creation && Math.random() < chance) {
-            let inputIndex = Math.floor(Math.random() * this.list.length),
-                outputIndex = Math.floor(Math.random() * this.list.length),
-                inputNode = this.list[inputIndex],
-                outputNode = this.list[outputIndex];
 
-            inputNode.project(outputNode);
-        }
+        projections && this.mutateProjections(chance);
+        nodes && this.mutateNodes(chance);
+    }
+
+    mutateNodes(chance:number = 0.1) {
         // Add random node
-        if (creation && Math.random() < chance) {
+        if (Math.random() > 1 - chance / 10) {
             let projections = this.projections(),
                 index = Math.floor(Math.random() * projections.length),
                 projection = projections[index],
@@ -143,5 +146,42 @@ export class Layer {
             newNode.project(outputNode);
             projection.output = newNode;
         }
+    }
+
+    mutateProjections(chance:number = 0.1) {
+        // Add random connection
+        if (Math.random() > 1 - chance / 10) {
+            let inputIndex = Math.floor(Math.random() * this.list.length),
+                outputIndex = Math.floor(Math.random() * this.list.length),
+                inputNode = this.list[inputIndex],
+                outputNode = this.list[outputIndex];
+
+            inputNode.project(outputNode);
+        }
+        // Remove random connection
+        else if (Math.random() > 1 - chance / 10) {
+            let projections = this.projections(),
+                index = Math.floor(Math.random() * projections.length),
+                projection = projections[index],
+                inputNode = projection.input,
+                outputNode = projection.output;
+
+            inputNode.deproject(outputNode);
+        }
+    }
+
+    clone():Layer {
+        let layer = new Layer(0, this.label);
+        this.list.forEach(node => {
+            layer.add(node);
+        });
+        // this.projections().forEach(projection => {
+        //     let inputIndex = this.list.indexOf(projection.input),
+        //         outputIndex = this.list.indexOf(projection.output),
+        //         inputNode = layer.list[inputIndex],
+        //         outputNode = layer.list[outputIndex];
+        //     inputNode.project(outputNode, projection.weight);
+        // });
+        return layer;
     }
 }

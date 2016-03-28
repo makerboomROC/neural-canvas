@@ -3,22 +3,29 @@ import {Herbivore} from "./herbivore";
 import {World} from "./world";
 import {Entity} from "./entity";
 import {Plant} from "./plant";
+import {HerbivoreWorld} from "./herbivore.world";
+import {DecimalPipe} from "angular2/common";
 
 @Component({
     selector: 'herbivore-canvas',
-    templateUrl: 'herbivore/herbivore.canvas.component.html'
+    templateUrl: 'herbivore/herbivore.canvas.component.html',
+    pipes:[DecimalPipe]
 })
 export class HerbivoreCanvasComponent implements AfterViewInit {
     @ViewChild("canvas")
     canvas;
     context:CanvasRenderingContext2D;
-    world:World;
     canvasElement:HTMLCanvasElement;
 
+    world:HerbivoreWorld;
+    entities:Entity[] = [];
+    herbivores:Herbivore[] = [];
+    lastHerbivore:Herbivore = null;
+    bestHerbivore:Herbivore = null;
+    plants:Plant[] = [];
+
     constructor() {
-        this.world = new World(400);
-        this.world.add(new Herbivore({x: 10, y: 10}, 180));
-        this.world.add(new Plant({x: 30, y: 30}));
+        this.world = new HerbivoreWorld(400);
     }
 
     ngAfterViewInit() {
@@ -29,14 +36,29 @@ export class HerbivoreCanvasComponent implements AfterViewInit {
     tick() {
         this.world.tick();
 
-        let context = this.getContext();
-        this.clearCanvas(context);
-        this.world.entities.forEach(entity => {
-            this.drawEntity(entity, context);
+        this.entities = this.world.entities;
+        this.herbivores = this.world.herbivores();
+        this.lastHerbivore = this.herbivores[this.herbivores.length - 1];
+        this.bestHerbivore = this.herbivores.reduce((best, herbivore) => {
+            if(!best || best.energy < herbivore.energy) {
+                best = herbivore;
+            }
+            return best;
         });
+        this.plants = this.world.plants();
+
+        this.draw();
 
         requestAnimationFrame(() => {
             this.tick();
+        });
+    }
+
+    protected draw() {
+        let context = this.getContext();
+        this.clearCanvas(context);
+        this.entities.forEach(entity => {
+            this.drawEntity(entity, context);
         });
     }
 
@@ -58,6 +80,10 @@ export class HerbivoreCanvasComponent implements AfterViewInit {
         context.save();
         context.translate(x, y);
         context.fillStyle = "#000000";
+        if(herbivore === this.lastHerbivore)
+            context.fillStyle = "#EE0000";
+        if(herbivore === this.bestHerbivore)
+            context.fillStyle = "#00EE00";
         context.rotate(angle);
         context.beginPath();
         context.moveTo(0, -size);

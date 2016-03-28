@@ -1,6 +1,8 @@
 import {Layer} from "./layer";
+import {Connection} from "./connection";
+import {Node} from "./node";
 
-export class Network{
+export class Network {
 
     static perceptron(...layerSizes:number[]):Network {
         let inputSize = layerSizes.shift(),
@@ -29,8 +31,17 @@ export class Network{
 
     constructor(input?:Layer, output?:Layer, hidden:Layer[] = []) {
         this.input = input || new Layer();
-        this.output = output|| new Layer();
+        this.output = output || new Layer();
         this.hidden = hidden;
+    }
+
+    projections(onlyHidden:boolean = false):Connection[] {
+        let projections = [],
+            nodes = this.nodes(onlyHidden);
+        nodes.forEach(node => {
+            projections = projections.concat(node.outputs);
+        });
+        return projections;
     }
 
     activate(input?:any):number[] {
@@ -77,8 +88,13 @@ export class Network{
         this.output.reset();
     }
 
-    nodes() {
-        let result = this.input.list.concat(this.output.list);
+    nodes(onlyHidden:boolean = false):Node[] {
+        let result = [];
+        if (!onlyHidden) {
+            result = result
+                .concat(this.input.list)
+                .concat(this.output.list);
+        }
         this.hidden.forEach(layer => {
             result = result.concat(layer.list);
         });
@@ -86,11 +102,64 @@ export class Network{
     }
 
     mutate(chance:number = 0.1) {
-        this.input.mutate(chance, false);
-        this.output.mutate(chance, false);
+
+        this.mutateProjections(chance);
+        this.mutateNodes(chance);
+
+        this.input.mutate(chance, false, false);
+        this.output.mutate(chance, false, false);
         this.hidden.forEach(layer => {
-            layer.mutate(chance);
+            layer.mutate(chance, false, false);
         });
+
+    }
+
+    mutateProjections(chance:number = 0.1) {
+        // Add random connection
+        if (Math.random() < chance / 10) {
+            let nodes = this.nodes(),
+                inputIndex = Math.floor(Math.random() * nodes.length),
+                outputIndex = Math.floor(Math.random() * nodes.length),
+                inputNode = nodes[inputIndex],
+                outputNode = nodes[outputIndex];
+
+            inputNode.project(outputNode);
+        }
+        // Remove random connection
+        else if (Math.random() < chance / 10) {
+            let projections = this.projections(),
+                index = Math.floor(Math.random() * projections.length),
+                projection = projections[index],
+                inputNode = projection.input,
+                outputNode = projection.output;
+
+            inputNode.deproject(outputNode);
+        }
+    }
+
+    mutateNodes(chance:number = 0.1) {
+        let index = Math.floor(Math.random() * this.hidden.length),
+            layer = this.hidden[index];
+        layer.mutateNodes(chance);
+    }
+
+    clone() {
+        let input = this.input.clone(),
+            output = this.output.clone(),
+            hidden = this.hidden.map(layer => layer.clone()),
+            originalNodes:Node[] = this.nodes(),
+            network = new Network(input, output, hidden),
+            nodes = network.nodes();
+
+        originalNodes.forEach((originalInputNode, inputIndex) => {
+            let inputNode = nodes[inputIndex];
+            originalInputNode.outputs.forEach((originalOutputNode, outputIndex) => {
+                let outputNode = nodes[outputIndex];
+                inputNode.project(outputNode);
+            });
+        });
+
+        return network;
     }
 }
 
