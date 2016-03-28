@@ -124,7 +124,7 @@ export class Layer {
             node.mutate(chance);
         });
         // Add random connection
-        if(creation && Math.random() < chance) {
+        if (creation && Math.random() < chance) {
             let inputIndex = Math.floor(Math.random() * this.list.length),
                 outputIndex = Math.floor(Math.random() * this.list.length),
                 inputNode = this.list[inputIndex],
@@ -133,7 +133,7 @@ export class Layer {
             inputNode.project(outputNode);
         }
         // Add random node
-        if(creation && Math.random() < chance) {
+        if (creation && Math.random() < chance) {
             let projections = this.projections(),
                 index = Math.floor(Math.random() * projections.length),
                 projection = projections[index],

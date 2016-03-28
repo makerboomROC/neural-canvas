@@ -1,6 +1,6 @@
 import {Layer} from "./layer";
 
-export class Network {
+export class Network{
 
     static perceptron(...layerSizes:number[]):Network {
         let inputSize = layerSizes.shift(),
@@ -33,7 +33,7 @@ export class Network {
         this.hidden = hidden;
     }
 
-    activate(input?:any) {
+    activate(input?:any):number[] {
         if (this.optimized === false) {
             this.input.activate(input);
             this.hidden.forEach(layer => {
@@ -92,4 +92,8 @@ export class Network {
             layer.mutate(chance);
         });
     }
+}
+
+export class Perceptron extends Network {
+
 }

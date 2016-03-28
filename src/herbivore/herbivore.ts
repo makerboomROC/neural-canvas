@@ -1,61 +1,85 @@
-import {HerbivorePropulsion} from "./herbivore.propulsion";
-import {HerbivoreNetwork} from "./herbivore.network";
-import {HerbivoreRotation} from "./herbivore.rotation";
 import {Location} from './location';
 import {Entity} from "./entity";
 import {World} from "./world";
-import {HerbivoreNose} from "./herbivore.nose";
 import {Plant} from "./plant";
-import {HerbivoreMouth} from "./herbivore.mouth";
-import {HerbivoreHealth} from "./herbivore.health";
+import {HerbivoreSystem} from "./herbivore.system";
 
-export class Herbivore extends Entity{
+export class Herbivore extends Entity {
     orientation:number;
-
-    nose:HerbivoreNose;
-    mouth:HerbivoreMouth;
-    health:HerbivoreHealth;
-
-    rotation:HerbivoreRotation;
-    propulsion:HerbivorePropulsion;
-
-    network:HerbivoreNetwork;
+    system:HerbivoreSystem;
 
     energy:number = 100;
     maxEnergy:number = 100;
+
+    maxSmellDistance:number = 40;
 
     constructor(location:Location, orientation?:number) {
         super(location);
 
         this.orientation = orientation || Math.random() * 360;
-
-        this.nose = new HerbivoreNose(this);
-        this.mouth= new HerbivoreMouth(this);
-        this.health= new HerbivoreHealth(this);
-
-        this.propulsion = new HerbivorePropulsion(this);
-        this.rotation = new HerbivoreRotation(this);
-
-        let inputs = [this.nose, this.mouth],
-            outputs = [this.propulsion, this.rotation];
-        let network = this.network = new HerbivoreNetwork(inputs, outputs),
-            count = 0;
+        this.system = new HerbivoreSystem(this);
     }
 
     tick(world:World) {
+        this.system.tick(world);
         super.tick(world);
-        if(this.energy > 0){
-            this.network.activate(world);
+    }
+
+    smell(world:World):number {
+        let plant = this.closestPlant(world);
+        if (typeof plant === 'undefined') {
+            return 0;
+        }
+        let distance = plant.distance(this.location),
+            strength = 1 - distance / this.maxSmellDistance;
+        return strength > 1 ? 1 : strength;
+    }
+
+    health():number {
+        return this.energy / this.maxEnergy;
+    }
+
+    eat(world:World) {
+        let plant = this.closestPlant(world);
+        if (plant && plant.distance(this.location) < 0.1) {
+            let gain = plant.energy,
+                maxGain = this.maxEnergy - this.energy;
+            if (gain > maxGain) {
+                gain = maxGain;
+            }
+            plant.energy -= gain;
+            this.energy += gain;
         }
     }
 
-    eat(plant:Plant) {
-        let gain = plant.energy,
-            maxGain = this.maxEnergy - this.energy;
-        if(gain > maxGain) {
-            gain = maxGain;
-        }
-        plant.energy -= gain;
-        this.energy += gain;
+    move(distance:number) {
+        let orientation = this.orientation - 90,
+            angle = (Math.PI / 180) * orientation,
+            dx = distance * Math.cos(angle),
+            dy = distance * Math.sin(angle);
+        this.location.x += dx;
+        this.location.y += dy;
+        this.energy -= distance * 0.1;
+    }
+
+    rotate(degrees:number) {
+        this.orientation += degrees;
+    }
+
+    protected closestPlant(world:World):Plant {
+        let plants = world.entities.filter(entity => entity instanceof Plant),
+            location = this.location,
+            closestPlant = null,
+            closestDistance = Infinity;
+
+        plants.forEach(plant => {
+            let distance = plant.distance(location);
+            if (distance < closestDistance) {
+                closestPlant = plant;
+                closestDistance = distance;
+            }
+        });
+
+        return closestPlant;
     }
 }

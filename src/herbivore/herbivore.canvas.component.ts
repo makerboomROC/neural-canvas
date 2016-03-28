@@ -50,9 +50,11 @@ export class HerbivoreCanvasComponent implements AfterViewInit {
 
     protected drawHerbivore(herbivore:Herbivore, context:CanvasRenderingContext2D) {
         let size = 3,
-            x = Math.abs(herbivore.location.x % this.world.width),
-            y = Math.abs(herbivore.location.y % this.world.height),
+            x = herbivore.location.x % this.world.width,
+            y = herbivore.location.y % this.world.height,
             angle = (Math.PI / 180) * herbivore.orientation;
+        if(x < 0) x = this.world.width + x;
+        if(y < 0) y = this.world.height+ y;
         context.save();
         context.translate(x, y);
         context.fillStyle = "#000000";
