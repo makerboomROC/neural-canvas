@@ -115,7 +115,7 @@ export class Herbivore extends Entity {
             closestDistance = Infinity;
 
         plants.forEach(plant => {
-            let distance = plant.distance(location);
+            let distance = plant.distanceTo(location);
             if (distance < closestDistance) {
                 closestPlant = plant;
                 closestDistance = distance;
