@@ -21,7 +21,7 @@ export class Forager extends Entity {
         this.genome = genome || new Genome({
             layers: [3, 3, 3]
         });
-        this.network = new Network(this.genome);
+        this.network = Network.build(this.genome);
         this.viewAngle = Forager.viewAngle;
         this.viewDistance = Forager.viewDistance;
         this.shape = Shape.Triangle;

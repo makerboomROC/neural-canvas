@@ -7,9 +7,13 @@ export class Neuron {
     relaxation:number;
     axons:Axon[];
 
-    constructor(gene:Gene) {
-        this.threshold = gene.threshold;
-        this.relaxation = gene.relaxation;
+    static build(gene:Gene) {
+        return new Neuron(gene.threshold, gene.relaxation);
+    }
+
+    constructor(threshold:number, relaxation:number) {
+        this.threshold = threshold;
+        this.relaxation = relaxation;
         this.energy = 0;
         this.axons = [];
     }
@@ -45,7 +49,7 @@ export class Neuron {
     }
     
     project(target:Neuron, strength:number):Axon {
-        let axon = new Axon(target, strength);
+        let axon = new Axon(this, target, strength);
         this.axons.push(axon);
         return axon;
     }

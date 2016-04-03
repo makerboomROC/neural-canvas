@@ -4,9 +4,11 @@ export class Axon {
     static maxStrength:number = 20;
 
     strength:number;
+    origin:Neuron;
     target:Neuron;
 
-    constructor(target:Neuron, strength:number) {
+    constructor(origin:Neuron, target:Neuron, strength:number) {
+        this.origin = origin;
         this.target = target;
         this.strength = strength;
     }

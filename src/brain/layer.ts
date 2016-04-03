@@ -3,20 +3,25 @@ import {Gene} from "../dna/gene";
 
 export class Layer {
     neurons:Neuron[];
+    size:number;
     output:Layer;
 
-    constructor(genes:Gene[], output?:Layer) {
-        this.neurons = [];
+    static build(genes:Gene[], output?:Layer):Layer {
+        let neurons = genes.map(gene => {
+                return Neuron.build(gene);
+            });
+        return new Layer(output, neurons);
+    }
+
+    constructor(output?:Layer, neurons:Neuron[] = []) {
         this.output = output;
-        genes.forEach(gene => {
-            let neuron = new Neuron(gene);
-            this.neurons.push(neuron);
-        });
+        this.neurons = neurons;
+        this.size = 0;
     }
 
     activate(inputs?:number[]):number[] {
         // Input Layer
-        if(typeof inputs !== 'undefined') {
+        if (typeof inputs !== 'undefined') {
             return this.neurons.map((neuron, index) => {
                 let input = inputs[index];
                 return neuron.activate(input);
@@ -28,7 +33,8 @@ export class Layer {
         }
     }
 
-    size():number {
-        return this.neurons.length;
+    add(neuron:Neuron):number {
+        this.size = this.neurons.push(neuron);
+        return this.size;
     }
 }
