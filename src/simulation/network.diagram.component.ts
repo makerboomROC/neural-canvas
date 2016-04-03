@@ -24,7 +24,6 @@ export class NetworkDiagramComponent implements AfterViewInit, OnChanges {
     private canvasContext;
     private canvasBorder = 0;
 
-    canvasBorder:number;
     private neuronRadius;
     private neuronSpread;
 

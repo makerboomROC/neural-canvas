@@ -13,17 +13,19 @@ export class Population <EntityType extends Entity> {
     }
 
     /**
-     * Life tick
+     * Ticks every entity, removing it if dead.
+     * Returns removed entities.
+     * @returns {Entity[]}
      */
-    tick():boolean {
-        this.entities.forEach((entity, index) => {
-            if(!entity.tick()) {
-                this.entities.splice(index, 1);
+    tick(...args:any[]):Entity[] {
+        let removed = [];
+        this.forEach((entity) => {
+            if(entity.tick(...args) === false) {
+                this.remove(entity);
             }
         });
-        return true;
+        return removed;
     }
-
 
     add(entity:EntityType):boolean {
         if(this.entities.length >= this.max) return false;
@@ -31,7 +33,17 @@ export class Population <EntityType extends Entity> {
         return true;
     }
 
-    forEach(callback:(entity:EntityType, index:number) => void) {
+    remove(entity:EntityType):boolean {
+        let index = this.entities.indexOf(entity);
+        if(index > -1) {
+            this.entities.splice(index, 1);
+            this.size--;
+            return true;
+        }
+        return false;
+    }
+    
+    forEach(callback:(entity:EntityType, index:number) => void):void {
         this.entities.forEach(callback);
     }
 

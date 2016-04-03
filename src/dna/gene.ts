@@ -1,7 +1,6 @@
 import {GeneSource} from "./gene.source";
 
 export class Gene {
-    static maxOutputs = 4;
     static maxRelaxation = 99;
     static maxStrength = 12;
     static minTrigger = 5;

@@ -4,48 +4,31 @@ import {Entity} from "./entity";
 export class World {
     width:number;
     height:number;
-    populations:Population<any>[];
+    population:Population<Entity>;
     age:number;
+    size:number;
 
-    constructor(width:number, height:number = width) {
+    constructor(width:number, height?:number) {
         this.width = width;
-        this.height = height;
-        this.populations = [];
+        this.height = typeof height !== 'undefined' ? height : width;
+        this.population = new Population<Entity>();
         this.age = 0;
     }
 
-    add(population:Population<any>) {
-        this.populations.push(population);
+    add(entity:Entity) {
+        this.population.add(entity);
     }
 
-    size():number {
-        return this.populations.reduce((sum, population) => population.size, 0)
+    remove(entity:Entity):boolean {
+        return this.population.remove(entity);
     }
 
-    forEach(callback:(population:Population<any>, index:number) => void) {
-        this.populations.forEach(callback);
+    forEach(callback:(entity:Entity, index:number) => void) {
+        this.population.forEach(callback);
     }
 
-    forEachEntity(callback:(entity:Entity, index:number) => void) {
-        this.forEach((population) => {
-            population.forEach(callback);
-        });
-    }
-
-    fittest():Entity {
-        let fittest:Entity = null;
-        this.populations.map(population => population.fittest()).forEach(entity => {
-            if(fittest === null || fittest.fitness() < entity.fitness()) {
-                fittest = entity;
-            }
-        });
-        return fittest;
-    }
-
-    tick() {
-        this.populations.forEach(population => {
-            population.tick();
-        });
+    tick(...args:any[]) {
+        this.population.tick(this, ...args);
         this.age++;
     }
 }

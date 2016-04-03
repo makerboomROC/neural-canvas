@@ -1,5 +1,4 @@
 import {Component} from "angular2/core";
-import {HerbivoreCanvasComponent} from "../herbivore/herbivore.canvas.component";
 import {ForagerSimulationComponent} from "../forager/forager.simulation.component";
 
 @Component({
