@@ -1,12 +1,13 @@
 import {Network} from "../brain/network";
 import {Genome} from "../dna/genome";
-import {Entity} from "../world/entity";
 import {ForagerWorld} from "./forager.world";
-import {ForagerGenome} from "./forager.genome";
 import {Food} from "./food";
 import {Shape} from "../world/shape";
+import {ThinkingEntity} from "../world/thinking.entity";
 
-export class Forager extends Entity {
+export class Forager extends ThinkingEntity {
+    static maxVelocity:number = 0.5;
+    static maxTurn:number = 0.2;
     static maxEnergy:number = 10000;
     static viewAngle:number = Math.PI;
     static viewDistance:number = 192;
@@ -17,31 +18,29 @@ export class Forager extends Entity {
     viewDistance:number;
 
     constructor(x:number, y:number, angle:number, genome?:Genome) {
-        super(x, y, angle, Forager.maxEnergy);
-        this.genome = genome || new Genome({
-            layers: [3, 3, 3]
-        });
-        this.network = Network.build(this.genome);
+        genome = genome || new Genome({
+                layers: [3, 3, 3]
+            });
+        let network = Network.build(genome);
+        super(x, y, angle, Forager.maxEnergy, network);
+        this.genome = genome;
         this.viewAngle = Forager.viewAngle;
         this.viewDistance = Forager.viewDistance;
         this.shape = Shape.Triangle;
     }
 
     tick(world:ForagerWorld, ...args:any[]):boolean {
-        let food = world.findFood(this),
-            output = this.think(food),
-            velocity = output[0] * 0.5,
-            turnAngle = (output[1] - output[2]) * 0.2,
-            eat = output[2];
-
-        if(food && eat) this.eat(food);
-        this.move(velocity);
-        this.turn(turnAngle);
-
-        return super.tick(world, ...args);
+        let food = world.findFood(this);
+        return super.tick(world, food, ...args);
     }
 
-    think(food:Food):number[] {
+    act(speed:number, turnLeft:number, turnRight:number, eat:number, world:ForagerWorld, food:Food):void {
+        this.move(Forager.maxVelocity * speed);
+        this.turn(Forager.maxTurn * (turnRight - turnLeft));
+        if(eat > 0.5) this.eat(food);
+    }
+
+    sense(world:ForagerWorld, food:Food, ...args:any[]) {
         let leftAngle = 0,
             rightAngle = 0,
             health = this.energy / this.maxEnergy;
@@ -55,11 +54,12 @@ export class Forager extends Entity {
             }
         }
 
-        return this.network.activate([1, health, leftAngle, rightAngle]);
+        return [1, health, leftAngle, rightAngle];
     }
     
+
     eat(food:Food):boolean {
-        if(food === null) {
+        if (food === null) {
             return false;
         }
 
@@ -68,7 +68,7 @@ export class Forager extends Entity {
             mouthX = this.x + deltaX,
             mouthY = this.y + deltaY;
 
-        if(!food.touchesXY(mouthX, mouthY)) {
+        if (!food.touchesXY(mouthX, mouthY)) {
             return false;
         }
         this.drain(food);

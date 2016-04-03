@@ -31,17 +31,14 @@ export class Entity {
     }
 
     /**
-     * Life tick
+     * Returns false if died(energy < 0) this tick, true otherwise
+     * @returns {boolean}
      */
     tick(...args:any[]):boolean {
-        if (this.energy < 1) {
-            return false;
-        }
-
         this.energy -= 0.1;
         this.age++;
 
-        return true;
+        return this.energy <= 0;
     }
 
     /**
