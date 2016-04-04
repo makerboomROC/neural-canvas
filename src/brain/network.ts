@@ -1,6 +1,7 @@
 import {Layer} from "./layer";
-import {Genome} from "../dna/genome";
 import {Neuron} from "./neuron";
+import {NetworkGenome} from "./network.genome";
+import {NeuronGene} from "./neuron.gene";
 
 export class Network {
     layers:Layer[];
@@ -11,8 +12,8 @@ export class Network {
     output:Layer;
 
     neurons:Neuron[];
-    
-    static build(genome:Genome):Network {
+
+    static build(genome:NetworkGenome):Network {
         let index = genome.genes.length,
             outputLayer:Layer = null,
             layers = [];
@@ -23,10 +24,10 @@ export class Network {
 
             genes.forEach((gene, index) => {
                 if (outputLayer !== null) {
-                    gene.outputs.forEach((strength, target) => {
+                    (<NeuronGene>gene).outputs.forEach((strength, target) => {
                         let input = layer.neurons[index],
                             output = outputLayer.neurons[target];
-                        if(typeof output !== 'undefined') {
+                        if (typeof output !== 'undefined' && typeof strength === 'number') {
                             input.project(output, strength);
                         }
                     });
@@ -43,7 +44,7 @@ export class Network {
     }
 
     constructor(layers:Layer[]) {
-        if(layers.length < 3){
+        if (layers.length < 3) {
             throw new Error("A network must have at least 3 layers");
         }
         this.layers = [];
@@ -52,6 +53,7 @@ export class Network {
         this.input = this.layers[0];
         this.output = this.layers[this.layers.length - 1];
         this.hidden = this.layers.slice(1, this.layers.length - 1);
+        this.neurons = this.layers.reduce((neurons, layer) => neurons.concat(layer.neurons), []);
     }
 
     add(layer:Layer):number {

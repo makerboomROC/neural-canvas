@@ -19,23 +19,27 @@ export class SimulationComponent {
     worldComponent:WorldComponent;
 
     private _timer;
+    private _running:boolean;
 
     constructor() {
         this._timer = null;
+        this._running = false;
     }
 
     start() {
-        if(this._timer === null)
-        this._timer = setInterval(() => this.tick(), 10);
+        this._running = true;
+        this.tick();
     }
 
     stop() {
-        clearInterval(this._timer);
-        this._timer = null;
+        this._running = false;
     }
 
     tick() {
-        this.world.tick();
-        this.worldComponent.update();
+        if(this._running) {
+            this.world.tick();
+            this.worldComponent.update();
+            this._timer = setTimeout(() => this.tick());
+        }
     }
 }

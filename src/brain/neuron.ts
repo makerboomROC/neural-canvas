@@ -1,5 +1,5 @@
 import {Axon} from "./axon";
-import {Gene} from "../dna/gene";
+import {NeuronGene} from "./neuron.gene";
 
 export class Neuron {
     energy:number;
@@ -7,7 +7,7 @@ export class Neuron {
     relaxation:number;
     axons:Axon[];
 
-    static build(gene:Gene) {
+    static build(gene:NeuronGene) {
         return new Neuron(gene.threshold, gene.relaxation);
     }
 
@@ -24,11 +24,10 @@ export class Neuron {
         }
         if(this.excited()) {
             this.fire();
-            return 1;
         } else {
             this.relax();
-            return 0;
         }
+        return this.energy;
     }
 
     fire() {

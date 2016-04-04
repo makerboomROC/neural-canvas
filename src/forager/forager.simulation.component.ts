@@ -1,16 +1,17 @@
 import {Component, ViewChild, AfterViewInit} from "angular2/core";
 import {Forager} from "./forager";
-import {Food} from "./food";
 import {ForagerWorld} from "./forager.world";
 import {SimulationComponent} from "../simulation/simulation.component";
 import {NetworkDiagramComponent} from "../simulation/network.diagram.component";
 import {Network} from "../brain/network";
-import {ForagerGenome} from "./forager.genome";
+import {NetworkGenome} from "../brain/network.genome";
+import {NgIf} from "angular2/common";
+import {WorldComponent} from "../world/world.component";
 
 @Component({
     selector: 'forager-simulation',
     templateUrl: 'forager/forager.simulation.component.html',
-    directives: [SimulationComponent, NetworkDiagramComponent]
+    directives: [WorldComponent, NetworkDiagramComponent, NgIf]
 })
 
 export class ForagerSimulationComponent extends SimulationComponent implements AfterViewInit{
@@ -18,41 +19,38 @@ export class ForagerSimulationComponent extends SimulationComponent implements A
     world:ForagerWorld;
     fittestNetwork:Network;
 
+    @ViewChild(WorldComponent)
+    worldComponent:WorldComponent;
+
     @ViewChild(SimulationComponent)
     simulation:SimulationComponent;
 
     @ViewChild(NetworkDiagramComponent)
     networkDiagram:NetworkDiagramComponent;
+    fittest:Forager;
 
     constructor() {
         super();
         this.world = new ForagerWorld(400);
 
-        while (this.world.foragers.size < 20) {
+        while (this.world.foragers.size < 40) {
             let x = Math.floor(Math.random() * this.world.width),
                 y = Math.floor(Math.random() * this.world.height),
                 angle = Math.random() * Math.PI * 2,
-                genome = ForagerGenome.random([5,5,5]),
-                forager = new Forager(x, y, angle, genome);
+                forager = new Forager(x, y, angle);
             this.world.add(forager);
         }
-        while (this.world.foodSupply.size < 10) {
-            let x = Math.floor(Math.random() * this.world.width),
-                y = Math.floor(Math.random() * this.world.height),
-                food = new Food(x, y);
-            this.world.add(food);
-        }
+        this.fittest =null;
     }
 
     ngAfterViewInit(){
-        this.start();
+        requestAnimationFrame(() => this.start());
     }
 
     tick() {
-        this.simulation.tick();
-        let fittest = this.world.fittest();
-        if (fittest !== null) {
-            this.fittestNetwork = fittest.network;
-        }
+        super.tick();
+        let fittest = this.world.foragers.fittest();
+        this.fittest = fittest;
+        this.fittestNetwork = fittest !== null ? fittest.network : null;
     }
 }

@@ -42,24 +42,28 @@ export class WorldComponent implements AfterViewInit {
     }
 
     protected drawEntity(entity:Entity) {
-        let context = this.canvasContext;
-        this.drawShape(context, entity.shape, entity.x, entity.y, entity.angle);
+        let context = this.canvasContext,
+            fittest = this.world.population.fittest();
+        if(entity === fittest) {
+            this.drawShape(context, Shape.Circle, entity.x, entity.y, entity.angle, 2 + entity.radius, '#00FF00');
+        }
+        this.drawShape(context, entity.shape, entity.x, entity.y, entity.angle, entity.radius, entity.color);
     }
     
-    private drawShape(context:CanvasRenderingContext2D, shape:Shape, x:number, y:number, angle:number) {
+    private drawShape(context:CanvasRenderingContext2D, shape:Shape, x:number, y:number, angle:number, radius:number, color:string = '#000000') {
         context.save();
         context.translate(x, y);
         context.rotate(angle);
-        context.fillStyle = "#000000";
+        context.fillStyle = color;
         switch (shape) {
             case Shape.Triangle:
-                this.drawTriangle(context, 2);
+                this.drawTriangle(context, radius);
                 break;
             case Shape.Square:
-                this.drawSquare(context, 2);
+                this.drawSquare(context, radius);
                 break;
             case Shape.Circle:
-                this.drawCircle(context, 2);
+                this.drawCircle(context, radius);
                 break;
         }
         context.restore();

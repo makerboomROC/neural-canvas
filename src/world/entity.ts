@@ -7,6 +7,7 @@ export class Entity {
     angle:number;
     shape:Shape;
     radius:number;
+    color:string;
 
     maxEnergy:number;
     energy:number;
@@ -14,20 +15,20 @@ export class Entity {
     age:number;
     maxAge:number;
 
-
     constructor(x:number, y:number, angle?:number, maxEnergy?:number) {
         this.x = x;
         this.y = y;
         this.angle = typeof angle !== 'undefined' ? angle : 0;
 
         this.maxEnergy = typeof maxEnergy !== 'undefined' ? maxEnergy : Entity.maxEnergy;
-        this.energy = this.maxEnergy;
+        this.energy = this.maxEnergy - Math.floor(Math.random() * this.maxEnergy / 10);
 
         this.age = 0;
         this.maxAge = Infinity;
 
         this.shape = Shape.Circle;
         this.radius = 3;
+        this.color = '#000000';
     }
 
     /**
@@ -35,10 +36,10 @@ export class Entity {
      * @returns {boolean}
      */
     tick(...args:any[]):boolean {
-        this.energy -= 0.1;
+        this.energy -= 1;
         this.age++;
 
-        return this.energy <= 0;
+        return this.energy > 0;
     }
 
     /**
@@ -46,13 +47,11 @@ export class Entity {
      * @param entity
      * @returns {boolean}
      */
-    drain(entity:Entity):boolean {
-        if (entity.energy < 0 || this.energy > this.maxEnergy){
-            return false;
-        }
-        entity.energy--;
-        this.energy++;
-        return true;
+    drain(entity:Entity):number {
+        let amount = Math.max(Math.min(10, entity.energy), this.maxEnergy - this.energy);
+        entity.energy -= amount;
+        this.energy += amount;
+        return amount;
     }
 
     /**
@@ -60,15 +59,11 @@ export class Entity {
      * @param entity
      * @returns {boolean}
      */
-    charge(entity:Entity):boolean {
-        if (entity.energy > entity.maxEnergy || this.energy < 0) {
-            return false;
-        }
-
-        this.energy--;
-        entity.energy++;
-
-        return true;
+    charge(entity:Entity):number {
+        let amount = Math.max(Math.min(10, this.energy), entity.maxEnergy - entity.energy);
+        this.energy -= amount;
+        entity.energy += amount;
+        return amount;
     }
 
     move(distance:number):boolean {
@@ -90,7 +85,7 @@ export class Entity {
     }
 
     fitness():number {
-        return this.age + (this.energy / this.maxEnergy);
+        return this.age + this.energy;
     }
 
     distanceTo(entity:Entity):number {

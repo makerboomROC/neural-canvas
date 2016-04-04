@@ -76,7 +76,7 @@ export class NetworkDiagramComponent implements AfterViewInit, OnChanges {
             context.beginPath();
             // dContext.shadow("#000", 4, 2, 2);
 
-            // Color codinbg ( green = excitory / red = inhibitory )
+            // Color coding ( green = excitory / red = inhibitory )
             if (axon.strength > 0) context.strokeStyle = "#090";
             else context.strokeStyle = "#900";
 

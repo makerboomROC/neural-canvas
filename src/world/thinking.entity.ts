@@ -20,8 +20,9 @@ export class ThinkingEntity extends Entity {
         return [];
     }
 
-    think(...input:number[]):number[] {
-        return this.network.activate(...input);;
+    think(...args:number[]):number[] {
+        let input = args.map(arg => arg * 12);
+        return this.network.activate(input);
     }
 
     act(...args:any[]):void {

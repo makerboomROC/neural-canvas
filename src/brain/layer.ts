@@ -1,12 +1,12 @@
 import {Neuron} from "./neuron";
-import {Gene} from "../dna/gene";
+import {NeuronGene} from "./neuron.gene";
 
 export class Layer {
     neurons:Neuron[];
     size:number;
     output:Layer;
 
-    static build(genes:Gene[], output?:Layer):Layer {
+    static build(genes:NeuronGene[], output?:Layer):Layer {
         let neurons = genes.map(gene => {
                 return Neuron.build(gene);
             });
@@ -23,12 +23,14 @@ export class Layer {
         // Input Layer
         if (typeof inputs !== 'undefined') {
             return this.neurons.map((neuron, index) => {
-                let input = inputs[index];
-                return neuron.activate(input);
+                let input = inputs[index],
+                    energy = neuron.activate(input);
+                return energy / neuron.threshold;
             });
         } else {
             return this.neurons.map((neuron) => {
-                return neuron.activate();
+                let energy = neuron.activate();
+                return energy / neuron.threshold;
             });
         }
     }

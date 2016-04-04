@@ -1,32 +1,56 @@
 import {Network} from "../brain/network";
-import {Genome} from "../dna/genome";
+import {NetworkGenome} from "../brain/network.genome";
 import {ForagerWorld} from "./forager.world";
 import {Food} from "./food";
 import {Shape} from "../world/shape";
 import {ThinkingEntity} from "../world/thinking.entity";
 
 export class Forager extends ThinkingEntity {
-    static maxVelocity:number = 0.5;
-    static maxTurn:number = 0.2;
-    static maxEnergy:number = 10000;
+    static maxVelocity:number = 1;
+    static maxTurn:number = 0.3;
+    static maxEnergy:number = 1000;
     static viewAngle:number = Math.PI;
     static viewDistance:number = 192;
 
-    genome:Genome;
+    static networkInputs:number = 4;
+    static networkOutputs:number = 4;
+
+    genome:NetworkGenome;
     network:Network;
     viewAngle:number;
     viewDistance:number;
+    
+    eaten:number;
 
-    constructor(x:number, y:number, angle:number, genome?:Genome) {
-        genome = genome || new Genome({
-                layers: [3, 3, 3]
-            });
+    static genome(minLayers = 1, maxLayers = 3, minSize?:number, maxSize?:number):NetworkGenome {
+        if(typeof minSize === 'undefined') {
+            minSize = Math.min(Forager.networkInputs, Forager.networkOutputs);
+        }
+        if(typeof maxSize === 'undefined') {
+            maxSize = Math.round(Math.max(Forager.networkInputs, Forager.networkOutputs) * 1.5);
+        }
+        let hiddenLayers = [],
+            numLayers= Math.floor(minLayers + (maxLayers - minLayers) * Math.random());
+
+        while(hiddenLayers.length < numLayers) {
+            let layerSize = Math.floor(minSize + (maxSize - minSize) * Math.random());
+            hiddenLayers.push(layerSize);
+        }
+
+        let layers = [Forager.networkInputs].concat(hiddenLayers).concat([Forager.networkOutputs]);
+
+        return NetworkGenome.random(layers);
+    }
+
+    constructor(x:number, y:number, angle:number, genome?:NetworkGenome) {
+        genome = genome || Forager.genome();
         let network = Network.build(genome);
         super(x, y, angle, Forager.maxEnergy, network);
         this.genome = genome;
         this.viewAngle = Forager.viewAngle;
         this.viewDistance = Forager.viewDistance;
         this.shape = Shape.Triangle;
+        this.eaten = 0;
     }
 
     tick(world:ForagerWorld, ...args:any[]):boolean {
@@ -37,10 +61,11 @@ export class Forager extends ThinkingEntity {
     act(speed:number, turnLeft:number, turnRight:number, eat:number, world:ForagerWorld, food:Food):void {
         this.move(Forager.maxVelocity * speed);
         this.turn(Forager.maxTurn * (turnRight - turnLeft));
-        if(eat > 0.5) this.eat(food);
+        // if(eat > 0.5)
+            this.eat(food);
     }
 
-    sense(world:ForagerWorld, food:Food, ...args:any[]) {
+    sense(world:ForagerWorld, food:Food, ...args:any[]):number[] {
         let leftAngle = 0,
             rightAngle = 0,
             health = this.energy / this.maxEnergy;
@@ -54,7 +79,7 @@ export class Forager extends ThinkingEntity {
             }
         }
 
-        return [1, health, leftAngle, rightAngle];
+        return [20, health, leftAngle, rightAngle];
     }
     
 
@@ -71,7 +96,7 @@ export class Forager extends ThinkingEntity {
         if (!food.touchesXY(mouthX, mouthY)) {
             return false;
         }
-        this.drain(food);
+        this.eaten += this.drain(food);
         return true;
     }
 

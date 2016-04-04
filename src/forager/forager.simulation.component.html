@@ -1,6 +1,20 @@
-<simulation [world]="world"></simulation>
-<network-diagram [network]="fittestNetwork"></network-diagram>
-<dl>
-    <dt>Age</dt>
-    <dd>{{world.age}}</dd>
-</dl>
+<article style="display: flex;">
+    <world [world]="world"></world>
+    <network-diagram [network]="fittestNetwork"></network-diagram>
+    <section>
+        <dl *ngIf="world">
+            <dt>World Age</dt>
+            <dd>{{world.age}}</dd>
+            <dt>World Size</dt>
+            <dd>{{world.foragers.size}}</dd>
+        </dl>
+        <dl *ngIf="fittest">
+            <dt>Fittest Age</dt>
+            <dd>{{fittest.age}}</dd>
+            <dt>Fittest Energy</dt>
+            <dd>{{fittest.energy}}</dd>
+            <dt>Fittest Eaten</dt>
+            <dd>{{fittest.eaten}}</dd>
+        </dl>
+    </section>
+</article>

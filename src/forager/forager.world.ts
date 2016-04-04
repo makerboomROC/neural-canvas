@@ -2,22 +2,42 @@ import {World} from "../world/world";
 import {Forager} from "./forager";
 import {Population} from "../world/population";
 import {Food} from "./food";
-import {Genome} from "../dna/genome";
+import {NetworkGenome} from "../brain/network.genome";
 import {Entity} from "../world/entity";
+import {RestockPopulation} from "../world/restock.population";
 
 export class ForagerWorld extends World {
     static foodRestockRate = 100;
     static foodRatio = 1;
 
-    genomes:Genome[];
-    foragers:Population<Forager>;
-    foodSupply:Population<Food>;
+    genomes:NetworkGenome[];
+    foragers:RestockPopulation<Forager>;
+    foodSupply:RestockPopulation<Food>;
 
     constructor(width:number, height?:number) {
         super(width, height);
+        let max = 100;
         this.genomes = [];
-        this.population = this.foragers = new Population<Forager>();
-        this.foodSupply = new Population<Food>();
+        this.population = this.foragers = new RestockPopulation<Forager>(max, (population) => {
+            let x = Math.floor(Math.random() * this.width),
+                y = Math.floor(Math.random() * this.height),
+                angle = Math.floor(Math.random() * Math.PI * 2),
+                genome;
+            if(population.history.size > 0) {
+                let maxIndex = Math.floor(population.history.size / 10),
+                    index = Math.floor(Math.random() * maxIndex),
+                    forager = population.history.entities[index];
+                genome = forager.genome.clone();
+                genome.mutate();
+            }
+            return new Forager(x, y, 0, genome);
+        });
+        
+        this.foodSupply = new RestockPopulation<Food>(100, () => {
+            let x = Math.floor(Math.random() * this.width),
+                y = Math.floor(Math.random() * this.height);
+            return new Food(x, y);
+        });
     }
 
     add(entity:Entity|Food) {
@@ -45,7 +65,7 @@ export class ForagerWorld extends World {
         super.tick();
         this.foodSupply.tick();
 
-        this.restockFoodSupply();
+        // this.restockFoodSupply();
         this.connectEdges();
     }
 
