@@ -5,11 +5,11 @@ import {Entity} from "./entity";
 
 @Component({
     selector: 'world',
-    template: '<canvas #canvas width="400" height="400"></canvas>',
+    template: '<canvas #canvas [width]="width" [height]="height"></canvas>',
     directives: []
 })
 
-export class WorldComponent implements AfterViewInit {
+export class WorldComponent implements AfterViewInit, OnInit {
     @Input()
     world:World;
 
@@ -18,6 +18,13 @@ export class WorldComponent implements AfterViewInit {
     private canvasElement:HTMLCanvasElement;
     private canvasContext:CanvasRenderingContext2D;
 
+    width:number = 0;
+    height:number = 0;
+
+    ngOnInit() {
+        this.width = this.world.width;
+        this.height = this.world.height;
+    }
 
     ngAfterViewInit() {
         this.canvasElement = this.canvasChild.nativeElement;
@@ -31,9 +38,7 @@ export class WorldComponent implements AfterViewInit {
     }
 
     protected clear() {
-        let width = this.canvasElement.width,
-            height = this.canvasElement.height;
-        this.canvasContext.clearRect(0,0,width, height);
+        this.canvasContext.clearRect(0,0,this.width, this.height);
     }
     protected draw() {
         this.world.forEach(entity => {

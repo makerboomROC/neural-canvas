@@ -24,20 +24,21 @@ export class ForagerWorld extends World {
                 angle = Math.floor(Math.random() * Math.PI * 2),
                 genome;
             if(population.history.size > 0) {
-                let maxIndex = Math.floor(population.history.size / 10),
-                    index = Math.floor(Math.random() * maxIndex),
+                let topLength = Math.floor(population.history.size / 10),
+                    index = Math.floor(Math.random() * topLength),
                     forager = population.history.entities[index];
                 genome = forager.genome.clone();
                 genome.mutate();
             }
-            return new Forager(x, y, 0, genome);
-        });
+            return new Forager(x, y, angle, genome);
+        }, 100);
         
         this.foodSupply = new RestockPopulation<Food>(100, () => {
             let x = Math.floor(Math.random() * this.width),
                 y = Math.floor(Math.random() * this.height);
             return new Food(x, y);
-        });
+        }, 1000);
+        this.foodSupply.restock(true);
     }
 
     add(entity:Entity|Food) {

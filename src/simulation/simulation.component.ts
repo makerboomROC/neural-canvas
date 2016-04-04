@@ -28,7 +28,7 @@ export class SimulationComponent {
 
     start() {
         this._running = true;
-        this.tick();
+        this.frame();
     }
 
     stop() {
@@ -36,10 +36,16 @@ export class SimulationComponent {
     }
 
     tick() {
-        if(this._running) {
-            this.world.tick();
+        this.world.tick();
+    }
+
+    frame(ticks:number = 10) {
+        if (this._running) {
+            while (ticks-- > 0) {
+                this.tick();
+            }
             this.worldComponent.update();
-            this._timer = setTimeout(() => this.tick());
+            this._timer = setTimeout(() => this.frame());
         }
     }
 }

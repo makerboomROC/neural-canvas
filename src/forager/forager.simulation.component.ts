@@ -14,7 +14,7 @@ import {WorldComponent} from "../world/world.component";
     directives: [WorldComponent, NetworkDiagramComponent, NgIf]
 })
 
-export class ForagerSimulationComponent extends SimulationComponent implements AfterViewInit{
+export class ForagerSimulationComponent extends SimulationComponent implements AfterViewInit {
 
     world:ForagerWorld;
     fittestNetwork:Network;
@@ -28,10 +28,11 @@ export class ForagerSimulationComponent extends SimulationComponent implements A
     @ViewChild(NetworkDiagramComponent)
     networkDiagram:NetworkDiagramComponent;
     fittest:Forager;
+    newest:Forager;
 
     constructor() {
         super();
-        this.world = new ForagerWorld(400);
+        this.world = new ForagerWorld(800, 600);
 
         while (this.world.foragers.size < 40) {
             let x = Math.floor(Math.random() * this.world.width),
@@ -40,17 +41,19 @@ export class ForagerSimulationComponent extends SimulationComponent implements A
                 forager = new Forager(x, y, angle);
             this.world.add(forager);
         }
-        this.fittest =null;
+        this.fittest = null;
+        this.newest = null;
     }
 
-    ngAfterViewInit(){
+    ngAfterViewInit() {
         requestAnimationFrame(() => this.start());
     }
 
-    tick() {
-        super.tick();
+    frame(ticks?:number) {
+        super.frame(ticks);
         let fittest = this.world.foragers.fittest();
         this.fittest = fittest;
         this.fittestNetwork = fittest !== null ? fittest.network : null;
+        this.newest = this.world.foragers.entities[this.world.foragers.size - 1];
     }
 }

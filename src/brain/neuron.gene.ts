@@ -2,7 +2,7 @@ import {Gene} from "../dna/gene";
 import {GeneSource} from "../dna/gene.source";
 
 export class NeuronGene extends Gene{
-    static maxRelaxation = 99;
+    static maxRelaxation = 0.99;
     static maxStrength = 12;
     static minTrigger = 5;
     static maxTrigger = 20;
@@ -16,7 +16,7 @@ export class NeuronGene extends Gene{
 
     static random(outputSize:number = 4):NeuronGene {
         let threshold = ((NeuronGene.maxTrigger - NeuronGene.minTrigger) * Math.random() ) + NeuronGene.minTrigger,
-            relaxation = 1 - (Math.random() * (NeuronGene.maxRelaxation / 100)),
+            relaxation = 1 - (Math.random() * NeuronGene.maxRelaxation),
             outputs = [];
         while (outputs.length < outputSize) {
             let strength = Math.random() > 0.5 ? NeuronGene.maxStrength - (Math.random() * NeuronGene.maxStrength * 2 ) : null;

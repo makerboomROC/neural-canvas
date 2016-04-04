@@ -6,15 +6,17 @@ import {Shape} from "../world/shape";
 import {ThinkingEntity} from "../world/thinking.entity";
 
 export class Forager extends ThinkingEntity {
+    static lastId:number = 0;
     static maxVelocity:number = 1;
     static maxTurn:number = 0.3;
-    static maxEnergy:number = 1000;
+    static maxEnergy:number = 10000;
     static viewAngle:number = Math.PI;
     static viewDistance:number = 192;
 
     static networkInputs:number = 4;
     static networkOutputs:number = 4;
 
+    id:number;
     genome:NetworkGenome;
     network:Network;
     viewAngle:number;
@@ -22,15 +24,15 @@ export class Forager extends ThinkingEntity {
     
     eaten:number;
 
-    static genome(minLayers = 1, maxLayers = 3, minSize?:number, maxSize?:number):NetworkGenome {
+    static genome(minLayers = 1, maxLayers = 2, minSize?:number, maxSize?:number):NetworkGenome {
         if(typeof minSize === 'undefined') {
-            minSize = Math.min(Forager.networkInputs, Forager.networkOutputs);
+            minSize = Math.min(Forager.networkInputs, Forager.networkOutputs) - 1;
         }
         if(typeof maxSize === 'undefined') {
-            maxSize = Math.round(Math.max(Forager.networkInputs, Forager.networkOutputs) * 1.5);
+            maxSize = Math.max(Forager.networkInputs, Forager.networkOutputs) + 1;
         }
         let hiddenLayers = [],
-            numLayers= Math.floor(minLayers + (maxLayers - minLayers) * Math.random());
+            numLayers= Math.floor(minLayers + (maxLayers - minLayers + 1) * Math.random());
 
         while(hiddenLayers.length < numLayers) {
             let layerSize = Math.floor(minSize + (maxSize - minSize) * Math.random());
@@ -51,6 +53,7 @@ export class Forager extends ThinkingEntity {
         this.viewDistance = Forager.viewDistance;
         this.shape = Shape.Triangle;
         this.eaten = 0;
+        this.id = ++Forager.lastId;
     }
 
     tick(world:ForagerWorld, ...args:any[]):boolean {
@@ -59,8 +62,14 @@ export class Forager extends ThinkingEntity {
     }
 
     act(speed:number, turnLeft:number, turnRight:number, eat:number, world:ForagerWorld, food:Food):void {
-        this.move(Forager.maxVelocity * speed);
-        this.turn(Forager.maxTurn * (turnRight - turnLeft));
+        let distance = Forager.maxVelocity * speed;
+        if(this.move(distance)) {
+            this.energy -= distance * 1;
+        }
+        let angle = Forager.maxTurn * (turnRight - turnLeft);
+        if(this.turn(angle)){
+            this.energy -= angle * 0.1;
+        }
         // if(eat > 0.5)
             this.eat(food);
     }
@@ -79,7 +88,7 @@ export class Forager extends ThinkingEntity {
             }
         }
 
-        return [20, health, leftAngle, rightAngle];
+        return [20, health * 20, leftAngle * 20, rightAngle * 20];
     }
     
 

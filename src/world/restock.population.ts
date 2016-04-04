@@ -30,10 +30,10 @@ export class RestockPopulation <EntityType extends Entity> extends Population <E
         return removed;
     }
 
-    restock():EntityType[] {
+    restock(all:boolean = false):EntityType[] {
         let restocked = [];
 
-        if (this.restockRate === 0) {
+        if (all === true || this.restockRate === 0) {
             while (this.size < this.max) {
                 let entity = this.restockCallback(this);
                 this.add(entity);

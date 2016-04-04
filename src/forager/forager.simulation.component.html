@@ -9,12 +9,18 @@
             <dd>{{world.foragers.size}}</dd>
         </dl>
         <dl *ngIf="fittest">
+            <dt>Fittest ID</dt>
+            <dd>{{fittest.id}}</dd>
             <dt>Fittest Age</dt>
             <dd>{{fittest.age}}</dd>
             <dt>Fittest Energy</dt>
             <dd>{{fittest.energy}}</dd>
             <dt>Fittest Eaten</dt>
             <dd>{{fittest.eaten}}</dd>
+        </dl>
+        <dl *ngIf="newest">
+            <dt>Fittest ID</dt>
+            <dd>{{newest.id}}</dd>
         </dl>
     </section>
 </article>
